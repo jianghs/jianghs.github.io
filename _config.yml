@@ -3,10 +3,10 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Hexo
+title: Celery
 subtitle:
-description:
-author: John Doe
+description: Code | Gym | Music
+author: 米兰的老斑鸠
 language: zh-Hans
 timezone:
 
@@ -26,6 +26,11 @@ category_dir: categories
 code_dir: downloads/code
 i18n_dir: :lang
 skip_render:
+
+# Sidebar Avatar
+# in theme directory(source/images): /images/avatar.jpg
+# in site  directory(source/uploads): /uploads/avatar.jpg
+avatar: http://olhx6qws6.bkt.clouddn.com/avatar.png
 
 # Writing
 new_post_name: :title.md # File name of new posts
