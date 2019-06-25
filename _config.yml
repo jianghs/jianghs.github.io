@@ -3,7 +3,7 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Celery
+title: Life Line
 subtitle:
 description: Code | Gym | Music
 author: 米兰的老斑鸠
@@ -30,7 +30,9 @@ skip_render:
 # Sidebar Avatar
 # in theme directory(source/images): /images/avatar.jpg
 # in site  directory(source/uploads): /uploads/avatar.jpg
-avatar: http://olhx6qws6.bkt.clouddn.com/avatar.png
+#avatar: http://olhx6qws6.bkt.clouddn.com/avatar.png
+avatar: /uploads/timg.jpeg
+
 
 # Writing
 new_post_name: :title.md # File name of new posts
