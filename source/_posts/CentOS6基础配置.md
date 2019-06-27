@@ -1,26 +1,27 @@
 ---
-title: CentOS基础配置
+title: 'CentOS 基础配置'
 date: 2017-03-16 13:52:45
 tags: Linux
-categories:
+categories: codeing
 ---
-# CentOS基础配置
 
-## 下载、安装及配置jdk
+## CentOS基础配置
 
-1、在线下载 jdk
+### 下载、安装及配置jdk
+
+#### 在线下载 jdk
 
 ```bash
 wget --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u91-b14/jdk-8u91-linux-x64.rpm
 ```
 
-2、rpm 安装 jdk
+#### rpm 安装 jdk
 
 ```bash
 rpm -ivh jdk-8u91-linux-x64.rpm
 ```
 
-3、环境变量配置
+#### 环境变量配置
 
 编辑 profile 文件，在文件末尾添加以下：
 
@@ -32,13 +33,13 @@ export JAVA_HOME CLASSPATH PATH
 
 ```
 
-4、使 profile 生效
+#### 使 profile 生效
 
 ```bash
 source /etc/profile
 ```
 
-5、验证
+#### 验证
 
 ```bash
 [root@iZ0xi0lndyippx6f13iwviZ software]# java -version
@@ -48,7 +49,7 @@ Java HotSpot(TM) 64-Bit Server VM (build 25.121-b13, mixed mode)
 
 ```
 
-6、Q&A
+#### Q&A
 
 * *** permission denied
 
@@ -59,6 +60,7 @@ Java HotSpot(TM) 64-Bit Server VM (build 25.121-b13, mixed mode)
   ```bash
   chmod 755 ***
   ```
+
 * Exec format error
 
 Java 环境变量配置
@@ -66,19 +68,19 @@ Linux 系统分隔符为英文冒号 ：，而 Windows 系统分隔符为分号 
 
 ### 下载、安装及配置 TomCat
 
-1、下载 TomCat7
+#### 下载 TomCat7
 
 ```bash
 [root@iZ0xi0lndyippx6f13iwviZ software]# wget http://mirrors.tuna.tsinghua.edu.cn/apache/tomcat/tomcat-7/v7.0.75/bin/apache-tomcat-7.0.75.tar.gz
 ```
 
-2、解压 TomCat7
+#### 解压 TomCat7
 
 ```bash
 [root@iZ0xi0lndyippx6f13iwviZ software]# tar -zxv -f apache-tomcat-7.0.75.tar.gz
 ```
 
-3、运行 TomCat
+#### 运行 TomCat
 
 进入 TomCat 安装目录bin文件夹
 
@@ -86,7 +88,7 @@ Linux 系统分隔符为英文冒号 ：，而 Windows 系统分隔符为分号 
 sh startup.sh
 ```
 
-4、设置开机自启动
+#### 设置开机自启动
 
 编辑rc.local
 
@@ -102,14 +104,14 @@ export JAVA_HOME
 /usr/software/apache-tomcat-7.0.75/bin/startup.sh
 ```
 
-5、 部署
+#### 部署
 
 将项目打包成 war 包。
 将 war 包放在 tomcat webapps 目录下即可。
 
 ### 下载、安装及配置 MySql
 
-1、下载及安装
+#### 下载及安装
 
 由于 CentOS 中集成了 MySQL ,我们可以用如下命令查看是否安装了 MySQL 数据库：
 
@@ -164,7 +166,7 @@ Please report any problems with the /usr/bin/mysqlbug script!
 Starting mysqld:                                           [  OK  ]
 ```
 
-2、开机启动设置
+#### 开机启动设置
 
 通过如下命令确认mysqld服务是不是开机自动启动：
 
@@ -179,7 +181,8 @@ mysqld         	0:off	1:off	2:off	3:off	4:off	5:off	6:off
 [root@li1600-30 /]# chkconfig mysqld on
 ```
 
-3、设置
+#### 设置
+
 数据库安装完后只会有一个 root 账号，并且未设置密码。
 可以通过如下命令设置密码：
 
@@ -208,7 +211,7 @@ mysql>
 
 ```
 
-开启远程登录
+#### 开启远程登录
 
 查询 user 表，发现 root 用户对应的 host 只允许本地。
 
