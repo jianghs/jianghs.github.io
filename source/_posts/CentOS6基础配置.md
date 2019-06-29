@@ -255,3 +255,4 @@ mysql> flush privileges;
 ### 结语
 
 至此，完成 jdk 安装， tomcat 配置及工程部署， MySQL 数据库配置。
+哈哈哈
