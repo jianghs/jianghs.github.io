@@ -423,10 +423,10 @@ public class Audience {
 
 `args()` 限定符会将参数传递到通知中。
 
-## 在 XML 中声明切面
+### 在 XML 中声明切面
 
 当无法获得通知类的源码添加注解的时候，需要通过 XML 作为补充。
 
-## 注入 AspectJ 切面
+### 注入 AspectJ 切面
 
 当 Spring AOP 无法满足要求时，需要通过 AspectJ 实现。
