@@ -172,7 +172,7 @@ Starting mysqld:                                           [  OK  ]
 
 ```bash
 [root@li1600-30 /]# chkconfig --list | grep mysqld
-mysqld         	0:off	1:off	2:off	3:off	4:off	5:off	6:off
+mysqld         0:off 1:off 2:off 3:off 4:off 5:off 6:off
 ```
 
 我们发现 mysqld 并没有开机启动，可以将其设置为开机启动：
