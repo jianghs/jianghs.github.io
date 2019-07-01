@@ -2,7 +2,7 @@
 title: 'Git 常用命令'
 date: 2017-02-21 11:11:54
 tags: Git
-categories: codeing
+categories: coding
 ---
 
 ## Git常用命令

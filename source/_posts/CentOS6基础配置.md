@@ -2,7 +2,7 @@
 title: 'CentOS 基础配置'
 date: 2017-03-16 13:52:45
 tags: Linux
-categories: codeing
+categories: coding
 ---
 
 ## CentOS基础配置
