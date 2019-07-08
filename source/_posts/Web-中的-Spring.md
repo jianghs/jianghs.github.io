@@ -57,6 +57,91 @@ Spring MVC 基于模型-视图-控制器模式实现。
 
 ## 渲染 Web 视图
 
+### 创建 JSP 视图
+
+#### 配置使用于 JSP 的视图解析器
+
+推荐使用 `InternalResourceViewResolver` 来创建。
+
+```java
+public ViewResolver viewResolver() {
+    InternalResourceViewResolver resolver = new InternalResourceViewResolver();
+    resolver.setPrefix("/WEB-INF/views");
+    resolver.setSuffix(".jsp");
+    resolver.setExposeContextBeansAsAttributes(true);
+    return resolver;
+}
+```
+
+#### 解析 JSTL 视图
+
+只需设置它的 viewClass 属性即可
+
+```java
+resolver.setViewClass(JstlView.class);
+```
+
+#### 使用 Spring 的 JSP 库
+
+1. 渲染 HTML 表单标签
+2. 工具类标签
+
+### Apache Titles 视图定义布局
+
+略
+
+### 使用 Thymeleaf
+
+#### 配置 Thymeleaf 视图解析器
+
+1. 模板解析器
+2. 模板引擎
+3. 视图解析器
+
+```java
+@Bean
+public SpringResourceTemplateResolver templateResolver(){
+    SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
+    templateResolver.setApplicationContext(this.applicationContext);
+    templateResolver.setPrefix("/WEB-INF/templates/");
+    templateResolver.setSuffix(".html");
+    // HTML is the default value, added here for the sake of clarity.
+    templateResolver.setTemplateMode(TemplateMode.HTML);
+    // Template cache is true by default. Set to false if you want
+    // templates to be automatically updated when modified.
+    templateResolver.setCacheable(true);
+    return templateResolver;
+}
+
+@Bean
+public SpringTemplateEngine templateEngine(){
+    // SpringTemplateEngine automatically applies SpringStandardDialect and
+    // enables Spring's own MessageSource message resolution mechanisms.
+    SpringTemplateEngine templateEngine = new SpringTemplateEngine();
+    templateEngine.setTemplateResolver(templateResolver());
+    // Enabling the SpringEL compiler with Spring 4.2.4 or newer can
+    // speed up execution in most scenarios, but might be incompatible
+    // with specific cases when expressions in one template are reused
+    // across different data types, so this flag is "false" by default
+    // for safer backwards compatibility.
+    templateEngine.setEnableSpringELCompiler(true);
+    return templateEngine;
+}
+
+@Bean
+public ThymeleafViewResolver viewResolver(){
+    ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
+    viewResolver.setTemplateEngine(templateEngine());
+    return viewResolver;
+}
+```
+
+#### 定义 Thymeleaf 模板
+
+使用自定义的命名空间 `xmlns:th="http://www.thymeleaf.org"`
+
+Thymeleaf 方言 `@{}`
+
 ## Spring MVC 的高级技术
 
 ## 使用 Spring Web Flow
