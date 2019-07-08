@@ -1,7 +1,7 @@
 ---
-title: http 协议简介
+title: HTTP 协议简介
 date: 2019-07-08 23:55:27
-tags: Http
+tags: HTTP
 categories: coding
 ---
 
