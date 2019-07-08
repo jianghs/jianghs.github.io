@@ -144,6 +144,91 @@ Thymeleaf 方言 `@{}`
 
 ## Spring MVC 的高级技术
 
-## 使用 Spring Web Flow
+### Spring MVC 的替代方案
 
-## 保护 Web 应用
+#### 自定义 DispatcherServlet 配置
+
+通过重载 `customizeRegistration()` 方法，我们可以进行额外配置。
+
+#### 添加其他的 Servlet 和 Filter
+
+定义任意数量的初始化器类。最简单的方法是实现 Spring 的 `WebApplicationInitializer` 接口。
+
+#### 在 web.xml 中声明 DispatcherServlet
+
+略
+
+### 处理文件上传
+
+#### 配置 multipart 解析器
+
+委托给 Spring 中的 `MultipartResolver` 策略接口的实现。
+
+1. `CommonMultipartResolver`：使用 Jakarta Commons FileUpload 解析 multipart 请求。
+2. `StandardServletMultipartResolver`：依赖于 Servlet 3.0 对 multipart 请求的支持。
+
+#### 处理 multipart 请求
+
+`@RequestPart`：作用于控制器方法参数上。
+
+#### 接受 MultipartFile
+
+`MultipartFile` 接口
+
+### 在控制器处理异常
+
+1. 特定的 Spring 异常将自动映射为特定的 HTTP 状态码
+2. 异常上添加 `@ResponseStatus` 注解，从而将其映射为某一个 HTTP 状态码
+3. 在方法上添加 `@ExceptionHandler` 注解，使其用来处理异常。
+
+#### 将异常映射为 HTTP 状态码
+
+默认情况下，Spring 会将自身的一些异常自动转换成合适的状态码。
+
+`@ResponseStatus` 注解将异常映射为 HTTP 状态码。
+
+```java
+@ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "spittle not found")
+public class SpittleNotFoundException extends RuntimeException {
+}
+```
+
+#### 编写异常处理的方法
+
+`@ExceptionHandler` 当抛出指定的异常时，将会委托该方法处理。它能处理同一个控制器所有方法抛出的这类异常。
+
+### 为控制器添加通知
+
+`@ControllerAdvice` 修饰控制器通知类，这个类会包含一个或者多个如下类型
+
+* `@ExceptionHandler` 注解标注的方法
+* `@InitBinder` 注解标注的方法
+* `@ModelAttribute` 注解标注的方法
+
+### 跨重定向请求传输数据
+
+对于重定向来说，模型并不能用来传递数据。可以通过其他方案处理：
+
+* 使用 URL 模板以路径变量和 / 或查询参数的形式传递数据
+* 使用 flash 属性发送数据
+
+#### 通过 URL 模板进行重定向
+
+占位符自动填充，所有不安全字符会进行转义。
+
+如果属性找不到占位符，会自动以查询参数的形式附加到重定向 URL 上。
+
+```java
+model.addAttribute("name", xxx.getName());
+return "redirect:/xxx/{name}";
+```
+
+#### 使用 flash 属性
+
+```java
+model.addFlashAttribute("xxx", xxx);
+```
+
+flash 属性会一直携带这些数据知道下一次请求，才回消失。
+
+在执行重定向之前，所有的 flash 属性都会复制到会话中。重定向之后，存在会话中的 flash 属性会被取出，并从会话转移到模型中。
