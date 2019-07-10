@@ -9,6 +9,8 @@ categories: coding
 
 ### Spring 的数据访问哲学
 
+数据访问功能的组件称为 DAO 或者 Repository。
+
 ### 配置数据源
 
 ### 在 Spring 中使用 JDBC
