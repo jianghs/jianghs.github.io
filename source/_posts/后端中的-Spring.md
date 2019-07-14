@@ -119,14 +119,26 @@ public DataSource dataSourceJdbc() {
 
 ### 启用对缓存的支持
 
+TODO
+
 ### 为方法添加注解以支持缓存
 
+TODO
+
 ### 使用 XML 声明缓存
+
+略
 
 ## 使用 NoSQL 数据库
 
 ### MongoDB
 
+略
+
 ### Neo4j
 
+略
+
 ### Redis
+
+略
