@@ -105,6 +105,8 @@ public DataSource dataSourceJdbc() {
 
 ### 在 Spring 中使用 JDBC
 
+使用 JdbcTemplate 来插入数据，实例略。
+
 ## 使用对象-关系映射持久化数据
 
 ### 集成 Hibernate
