@@ -65,7 +65,7 @@ typedef struct list {
 
 由 list 结构和 listNode 结构组成的链表
 
-![c8f703c1a9126e916ad467856e7e975c.png](evernotecid://EA05E17F-96B0-42EF-BD42-FD4C89489054/appyinxiangcom/19614220/ENResource/p26)
+![c8f703c1a9126e916ad467856e7e975c.png](https://raw.githubusercontent.com/jianghs/myBlogPicBed/master/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E6%88%AA%E5%9B%BE/redis-list.png)
 
 特点：
 
@@ -115,7 +115,7 @@ typedef struct dictEntry {
 
 `*next` 可以将多个哈希值相同的键值对连接在一起。
 
-![a3ac5b305812a5978c71cecfbe9f740d.png](evernotecid://EA05E17F-96B0-42EF-BD42-FD4C89489054/appyinxiangcom/19614220/ENResource/p25)
+![a3ac5b305812a5978c71cecfbe9f740d.png](https://raw.githubusercontent.com/jianghs/myBlogPicBed/master/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E6%88%AA%E5%9B%BE/%E5%93%88%E5%B8%8C%E8%A1%A8.png)
 
 #### 字典
 
@@ -139,7 +139,7 @@ privdata 属性则保存了需要传递给特定函数的可选参数。
 
 ht 属性是包含两个项的数组，字典只使用 ht[0] 哈希表，ht[1] 哈希表只会在对 ht[0] 哈希表 rehash 时使用。
 
-![e16e53bef6a31ffa544aa79fcbe7aa05.png](evernotecid://EA05E17F-96B0-42EF-BD42-FD4C89489054/appyinxiangcom/19614220/ENResource/p27)
+![e16e53bef6a31ffa544aa79fcbe7aa05.png](https://raw.githubusercontent.com/jianghs/myBlogPicBed/master/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E6%88%AA%E5%9B%BE/dict.png)
 
 #### 哈希算法
 
@@ -180,7 +180,7 @@ index = hash & dict -> ht[x].sizemask
 
 跳跃表包括一个 zskiplist 和 若干个 zskiplistNode。
 
-![1204b7bf9e8b8d5c3223a4d229991ed1.png](evernotecid://EA05E17F-96B0-42EF-BD42-FD4C89489054/appyinxiangcom/19614220/ENResource/p28)
+![1204b7bf9e8b8d5c3223a4d229991ed1.png](https://raw.githubusercontent.com/jianghs/myBlogPicBed/master/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E6%88%AA%E5%9B%BE/skiplist.png)
 
 zskiplist 结构包含
 
@@ -277,7 +277,7 @@ int8_t contents[];
 4. entryX：各个节点。
 5. zlend：标记压缩列表末端。
 
-![e61837897f1b9bfd1d61b0a6bbb1b1b9.png](evernotecid://EA05E17F-96B0-42EF-BD42-FD4C89489054/appyinxiangcom/19614220/ENResource/p29)
+![e61837897f1b9bfd1d61b0a6bbb1b1b9.png](https://raw.githubusercontent.com/jianghs/myBlogPicBed/master/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E6%88%AA%E5%9B%BE/ziplist.png)
 
 #### 压缩列表节点
 
