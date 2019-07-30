@@ -132,7 +132,9 @@ min-salves-to-write 和 min-slaves-max-lag 防止主服务器在不安全的情�
 
 ## Sentinel
 
-### 启动并初始化 Sentinel 220
+哨兵解决方案：由一个或者多个 sentinel 实例组成的 sentinel 系统可以监视任意多个主服务器以及这些主服务器属下的所有从服务器。
+
+### 启动并初始化 Sentinel
 
 ### 获取主服务器信息
 
