@@ -136,25 +136,211 @@ min-salves-to-write 和 min-slaves-max-lag 防止主服务器在不安全的情�
 
 ### 启动并初始化 Sentinel
 
+#### 初始化服务器
+
+Sentinel 服务器本质上是一个 Redis 服务器，但是初始化过程不完全一致。
+
+![Sentinel-init](https://raw.githubusercontent.com/jianghs/myBlogPicBed/master/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E6%88%AA%E5%9B%BE/Sentinel-init.png)
+
+#### 将普通 Redis 服务器使用的代码替换成 Sentinel 专用代码
+
+指定自己的端口和载入自己的命令。
+
+#### 初始化 Sentinel 状态
+
+```c
+struct sentinelState {
+
+  // 当前纪元，用于实现故障转移
+  unit64_t current_epoch;
+
+  // 保存了所有被这个 sentinel 监视的主服务器
+  // 字典的键是主服务器的名字
+  // 字典的值时指向 sentinelRedisInstance 结构的指针
+  dict *masters;
+
+  // 是否进入 TILT 模式
+  int tilt;
+
+  // 目前正在执行的脚本的数量
+  int running_scripts;
+
+  // 进入 TILT 模式的时间
+  mstime_t tilt_start_time;
+
+  // 最后一次执行时间处理器的时间
+  mstime_t previous_time;
+
+  // 一个 FIFO 队列，包含了所有需要执行的用户脚本
+  list *scripts_queue;
+} sentinel;
+```
+
+#### 初始化 Sentinel 状态的 masters 属性
+
+* 字典的键是被监视的主服务器的名字
+* 字典的值指向被监视主服务器对应的 sentinelRedisInstance 结构
+
+每个实例结构代表一被 sentinel 监控的 Redis 服务器实例，这个实例可以是主服务器、从服务器或者另一个 Sentinel。
+
+```c
+typedef struct sentinelRedisInstance {
+
+  // 标识值，记录了实例的类型，以及该实例的当前状态
+  int flags;
+
+  // 实例的名字
+  // 主服务器的名字由用户在配置文件中设置
+  // 从服务器及 Sentinel 的名字由 Sentinel 自动设置
+  // 格式为 ip:port
+  char *name;
+
+  // 实例的运行 ID
+  char *runid;
+
+  // 配置纪元，用于实现故障转移
+  uint_64_t config_epoch;
+
+  // 实例的地址
+  sentinelAddr *addr;
+
+  // 实例无响应多少毫秒后才会被判断为主观下线
+  mstime_t down_after_period;
+
+  // 判断客观下线所需的支持投票数量
+  int quorum;
+
+  // 在执行故障转移时，可以同时对新的主服务器进行同步的从服务器数量
+  int parallel_syncs;
+
+  // 刷新故障转移状态的最大时限
+  mstime_t failover_timeout;
+
+  // ...
+} sentinelRedisInstance;
+```
+
+#### 创建连向主服务器的网络连接
+
+创建两个连向主服务器的异步连接：
+
+* 命令连接，用于向主服务器发送命令，并接受命令回复。
+* 订阅连接，用于订阅主服务器的 _sentinel_:hello 频道。
+
 ### 获取主服务器信息
+
+默认以每十秒一次的频率，通过命令连接向被监视的主服务器发送 INFO 命令，并通过分析 INFO 命令的回复来获取主服务器的当前信息。
+
+* 主服务器本身信息：run_id 域记录的服务器运行 ID，服务器角色。
+* 主服务器属下所有从服务器信息：slaves 字段。
 
 ### 获取从服务器信息
 
+Sentinel 会创建连接到从服务器的命令连接和订阅连接。
+
+会以每十秒一次的频率通过命令连接向从服务器发送 INFO 命令。
+
+命令回复如下：
+
+* 从服务器的运行 ID run_id。
+* 从服务器的角色 role。
+* 主服务器的 IP 地址 master_host，以及主服务器的端口号 master_port。
+* 主从服务器的连接状态 master_link_status。
+* 从服务器的优先级 slave_priority。
+* 从服务器的复制偏移量 slave_repl_offset。
+
 ### 向主服务器和从服务器发送信息
+
+默认情况下，Sentinel 会以每两秒一次的频率，通过命令连接向所有被监视的主服务器和从服务器发送命令。
+
+s_ 开头：记录的是 Sentinel 本身信息。
+
+m_ 开头：记录的是主服务器的信息。
 
 ### 接收来自主服务器和从服务器的频道信息
 
+对于每个与 Sentinel 连接的服务器，Sentinel 既通过命令连接向服务器的 \_sentinel\_:hello 频道发送信息，又通过订阅连接从服务器的 \_sentinel\_:hello 频道接收信息。
+
+对于监视同一个服务器的多个 Sentinel 来说，一个 Sentinel 发送的信息会被其他 Sentinel 接收到，包括发送的 Sentinel 自身。
+
+#### 更新 sentinels 字典
+
+Sentinel 还会记录除了自身之外的其他 Sentinels 信息。
+
+#### 创建连向其他 Sentinel 的命令连接
+
+Sentinel 之间只会创建命令连接，不会创建订阅连接。
+
 ### 检测主观下线状态
+
+默认情况下，Sentinel 会以每秒一次的频率向所有与它创建了命令连接的实例（包括主服务器、从服务器、其他 Sentinel 在内）发送 PING 命令，并通过实例返回的 PING 命令回复来判断实例是否在线。
+
+down-after-milliseconds 选项指定了 Sentinel 判断实例进入主观下线所需的时间长度，同样作用于监视 master 的其他 Sentinels。
 
 ### 检测客观下线状态
 
-### 选举领头 Sentinel 238
+当 Sentinel 将一个主服务器判断为主观下线后，为了确认这个主服务器是否真的下线，它会向同样监视这一主服务器的其他 Sentinel 进行询问，看他们是否也认为主服务器已经进入下线状态。当接收的数量足够多时，Sentinel 就会将主服务器判定为客观下线，并执行故障转移。
+
+#### 发送 SENTINEL is-master-down-by-addr 命令
+
+源 SENTINEL 服务器询问其他 SENTINEL 服务器主服务器是否已下线。
+
+#### 接收 SENTINEL is-master-down-by-addr 命令
+
+目标 SENTINEL 接收到命令后，分析参数，进行命令回复。返回对主服务器的检查结果。
+
+#### 接收 SENTINEL is-master-down-by-addr 命令的回复
+
+根据其他 Sentinel 的命令回复， Sentinel 将统计其他 Sentinel 同意主服务器已下线的数量，当这一数量达到配置指定的客观下线所需数量时，会将祝福器进入客观下线状态。
+
+### 选举领头 Sentinel
+
+当一个主服务器被判断为客观下线时，监视这个下线主服务器的各个 Sentinel 会进行协商，选举出一个领头 Sentinel，并由领头 Sentinel 对下线主观服务器执行故障转移操作。
+
+选举的规则和方法：
+
+* 所有在线的 Sentinel 都有被选举为领头 Sentinel 的资格。
+* 每次进行领头选举后，不论选举是否成功，所有 Sentinel 配置的纪元值都会自增一次。
+* 在一个配置纪元里面，所有 Sentinel 都有一次将某个 Sentinel 设置为局部领头 Sentinel 的机会，并且局部领头一旦设置完成，在这个配置纪元里面就不能修改。
+* 每个发现主服务器客观下线的 Sentinel 都会要求其他 Sentinel 将自己设置为局部领头 Sentinel。
+* Sentinel 设置局部领头 Sentinel 的规则是先到先得。
+* 目标 Sentinel 接收到命令后，会向源 Sentinel 发送一条命令回复，回复中的 leader_runid 参数和 leader_epoch 参数分别记录了目标 Sentinel 的局部领头 Sentinel 的运行 ID 和配置纪元。
+* 源 Sentinel 接收到目标 Sentinel 的命令回复后，检查配置纪元和自己的是否一致，如果相同，判断运行 ID 是否和自己一致，两者都一致表明目标 Sentinel 将源 Sentinel 设置为局部领头 Sentinel。
+* 如果某个 Sentinel 被半数以上的 Sentinel 设置成了局部领头 Sentinel，那么这个 Sentinel 称为领头 Sentinel。
+* 因为领头 Sentinel 需要半数以上的 Sentinel 的支持，并且每个 Sentinel 在每个配置纪元里面只能产生一次局部领头 Sentinel，所以在一次配置纪元里面只会出现一个领头 Sentinel。
+* 如果在给定的时间内，没有一个 Sentinel 被选举为领头 Sentinel，那么会进行重新选举，直到选出领头 Sentinel 为止。
 
 ### 故障转移
+
+选举出的领头 Sentinel 对已下线的主服务器进行故障转移
+
+1. 在已下线的主服务器属下的所有从服务器里面，挑选一个从服务器，并将其转换为主服务器。
+
+    挑选出一个状态良好、数据完整的从服务器，发送 SLAVEOF no one 命令。
+
+2. 让已下线的主服务器属下的所有从服务器改为复制新的主服务器。
+
+    向其他从服务器发送 SLAVEOF 命令。
+
+3. 将已下线的主服务器设置为新主服务器的从服务器。
+
+    已线下的服务器重新上线后，领头 Sentinel 发送 SLAVEOF 命令。
 
 ## 集群
 
 ### 节点
+
+刚开始的时候，每个节点是相互独立的，他们都处于只包含自己的集群中。
+
+通过 `CLUSTER MEET` 命令完成。
+
+#### 启动节点
+
+一个节点就是一个运行在集群模式下的 Redis 服务器。节点会继续使用单机模式下的服务器组件。
+
+#### 集群数据结构
+
+#### CLUSTER MEET 命令的实现
 
 ### 指派槽
 
