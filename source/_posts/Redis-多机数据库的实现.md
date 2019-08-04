@@ -340,13 +340,178 @@ down-after-milliseconds 选项指定了 Sentinel 判断实例进入主观下线�
 
 #### 集群数据结构
 
+每个节点都会使用一个 clusterNode 结构来记录自己的状态，并未集群中的所有其他节点（包括主节点和从节点）都创建一个相应的 clusterNode 结构。
+
+```c
+struct clusterNode {
+    // 创建节点的时间
+    mstime_t ctime;
+
+    // 节点的名字
+    char name[REDIS_CLUSTER_NAMELEN];
+
+    // 节点标识
+    // 使用各种不同的标识值记录节点的角色（比如主节点或者从节点）
+    // 以及节点目前所处的状态（比如在线或者下线）
+    int flags;
+
+    // 节点当前的配置纪元，用于实现故障转义
+    uint64_t configEpoch;
+
+    // 节点的 IP 地址
+    char ip[REDIS_IP_LEN];
+
+    // 节点的端口
+    int port;
+
+    // 保存连接节点所需的有关信息
+    clusterLink *link;
+
+    // ...
+}
+```
+
+clusterNode 结构的 link 属性是一个 clusterLink 结构，该结构保存了连接节点所需的有关信息，比如套接字描述符，输入缓冲区和输出缓冲区。
+
+```c
+typedef sturct clusterLink {
+
+    // 连接的创建时间
+    mstime_t ctime;
+
+    // TCP 套接字描述符
+    int fd;
+
+    // 输出缓冲区，保存着等待发送给其他节点的消息
+    sds sndbuf;
+
+    // 输入缓冲区，保存着从其他节点接收到的消息
+    sds rcvbuf;
+
+    // 与这个连接相关联的节点，如果没有的话就为 NULL
+    struct clusterNode *node;
+} clusterLink;
+```
+
+最后，每个节点都保存着一个 clusterState 结构，这个结构记录了在当前节点的视角下，集群目前所处的状态。
+
+```c
+typedef struct clusterState {
+
+    // 指向当前节点的指针
+    clusterNode *myself;
+
+    // 集群当前的配置纪元，用于实现故障转移
+    uint64_t currentEpoch;
+
+    // 集群当前的状态：上线还是下线
+    int state;
+
+    // 集群中至少处理这一个槽的节点的数量
+    int size;
+
+    // 集群节点名单
+    // 字典的键为节点的名字，字典的值为节点对应的 clusterNode 结构
+    dict *nodes;
+}
+```
+
 #### CLUSTER MEET 命令的实现
+
+客户端向节点 A 发送 CLUSTER MEET 命令，收到命令的节点 A 将于节点 B 进行握手。
+
+1. 节点 A 会为节点 B 创建一个 clusterNode 结构，并将该结构添加到自己的 clusterState.nodes 字典里面。
+
+2. 之后，节点 A 将根据 CLUSTER MEET 命令给定的 IP 地址和端口号，向节点 B 发送一条 MEET 消息。
+
+3. 如果一切顺利，节点 B 将接受到 节点 A 发送的 MEET 消息，节点 B 会为节点 A 创建一个 clusterNode 结构，并将该结构添加到自己的 clusterState.nodes 字典里面。
+
+4. 之后，节点 B 将向节点 A 返回一条 PONG 消息。
+
+5. 节点 A 接收到节点 B 返回的 PONG 消息后，就知道节点 B 成功接收到自己发送的 MEET 消息。
+
+6. 之后，节点 A 将向节点 B 返回一条 PING 消息。
+
+7. 节点 B 将接收到节点 A 返回的 PING 消息，通过这条消息节点 B 可以知道节点 A 已经成功接到自己返回的 PONG 消息，握手完成。
+
+握手完成后，节点 A 会将节点 B 的信息传播到集群中的其他节点，让其他节点与节点 B 进行握手，最终，节点 B 会被集群中的所有节点认识。
 
 ### 指派槽
 
+Redis 集群通过分片的方式来保存数据库中的键值对：集群的整个数据库被分为16384 个槽，数据库中的每个键都属于这16384个槽的其中一个，集群中的每个节点可以处理0个或者最多16384个槽。
+
+```redis
+CLUSTER ADDSLOTS <slot> [slot ...]
+```
+
+#### 记录节点的槽指派信息
+
+clusterNode 结构的 slots 属性和 numslot 属性记录了节点负责处理那些槽。
+
+```c
+struct clusterNode {
+    // ...
+
+    unsigned char slots[16384/8];
+
+    int numslots;
+    // ...
+}
+```
+
+#### 传播节点的槽指派信息
+
+一个节点除了将自己负责的槽记录在 clusterNode 结构的 slots 属性和 numslots 属性之外，还会将自己的 slots 数组通过消息发送给集群中的其他节点。
+
+其他节点接收到数组后，会从自己的 clusterState.nodes 字典中查找对应的 clusterNode 结构，并对结构中的 slots 数组进行保存或者更新。
+
+#### 记录所有槽的指派信息
+
+clusterState 结构中的 slots 数组记录了集群中所有 16384 个槽的指派信息：
+
+```c
+typedef struct clusterState {
+    // ...
+
+    clusterNode *slots[16384];
+
+    // ...
+}
+```
+
+* 如果 slots[i] 指针指向 NULL，表示槽 i 尚未指派给任何节点。
+* 如果 slots[i] 指针指向一个 clusterNode 结构，那么表示槽 i 已经指派给了 clusterNode 结构所代表的节点。
+
 ### 在集群中执行命令
 
+当客户端向节点发送与数据库键有关的命令时，接收命令的节点会计算出命令要处理的数据库键属于哪个槽，并检查这个槽是否指派给了自己：
+
+* 如果键所在的槽正好就指派给了当前节点，那么节点直接执行这个命令。
+* 如果没有指派给当前节点，那么节点会向客户端返回一个 MOVED 错误，指引客户端 redirect 至正确的节点，并在此发送之前的命令。
+
+#### 计算键属于哪个槽
+
+使用 `CLUSTER KEYSLOT <key>` 命令可以查看一个给定键属于哪个槽。
+
+#### 判断槽是否由当前节点负责处理
+
+如果 clusterState.slots[i] 等于 clusterState.myself，那么说明槽 i 由当前节点负责，节点可以执行命令。
+
+否则，返回 MOVED 错误，并指引客户端转向至正在处理槽 i 的节点。
+
+#### MOVED 错误
+
+错误格式：`MOVED <slot> <ip>:<port>`
+
+#### 节点数据库的实现
+
+节点只能使用 0 号数据库。
+
 ### 重新分片
+
+可以将任意数量已经指派给某个节点的槽改为指派给另一个节点，并且相关槽所属的键值对也会转移。
+
+重写分片操作可以在线进行，并且指派的两个节点都可以继续处理命令请求。
 
 ### ASK 错误
 
