@@ -515,6 +515,8 @@ typedef struct clusterState {
 
 ### ASK 错误
 
+当客户端向源节点发送一个与数据库键相关
+
 ### 复制与故障转移
 
 ### 消息
