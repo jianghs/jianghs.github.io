@@ -513,10 +513,86 @@ typedef struct clusterState {
 
 重写分片操作可以在线进行，并且指派的两个节点都可以继续处理命令请求。
 
-### ASK 错误
+### ASK 错误说明
 
-当客户端向源节点发送一个与数据库键相关
+当客户端向源节点发送一个与数据库键有关的命令，并且命令要处理的数据库键恰好就属于正在被迁移的槽中。
+
+* 源节点优先在自己的数据库中查找指定的键，如果找到就执行命令。
+* 如果没有找到，源节点将向客户端返回一个 ASK 错误，指引客户端转向正在导入槽的目标节点，并在此执行命令。
+
+#### CLUSTER SETSLOT IMPORTING 命令的实现
+
+clusterState 结构的 importing_slots_from 数组记录了当前节点正在从其他节点导入的槽。
+
+```c
+CLUSTER SETSLOT <i> IMPORTING <source_id>
+```
+
+#### CLUSTER SETSLOT MIGRATING 命令的实现
+
+clusterState 结构的 migrating_slots_to 数组记录了当前节点正在迁移至其他节点的槽。
+
+```c
+CLUSTER SETSLOT <i> MIGRATING <target_id>
+```
+
+#### ASK 错误
+
+通过查找 migrating_slots_to[i]，确认 key 所属的槽 i 是否正在迁移。
+
+如果正在迁移，则向客户端返回一个 ASK 错误，引导客户端到正在导入槽 i 的节点去查找 key。
+
+#### ASKING 命令
+
+ASKING 命令唯一要做的就是打开发送命令客户端的 REDIS_ASKING 标识。REDIS_ASKING 是一次性标识。
+
+节点判断是否执行客户端命令的过程
+
+![excute-client-command](https://raw.githubusercontent.com/jianghs/myBlogPicBed/master/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E6%88%AA%E5%9B%BE/excute-client-command.png)
+
+#### ASK 错误和 MOVED 错误的区别
+
+1. MOVED 错误代表槽的负责权已经从一个节点转移到另一个节点：在客户端收到关于槽 i 的 MOVED 错误之后，客户端每次遇到关于槽 i 的命令请求时，都可以直接将命令发送到 MOVED 错误指向的节点。
+2. ASK 错误只是两个节点在迁移槽的过程中使用的一个临时措施：在客户端收到关于槽 i 的 ASK 错误之后，客户端只会在接下来的一次命令请求中将关于槽 i 的命令请求发送至 ASK 错误所指示的节点。
 
 ### 复制与故障转移
 
+#### 设置从节点
+
+可以让接收命令的节点称为 node_id 所指定节点的从节点，并开始对主节点进行复制。
+
+```c
+CLUSTER REPLICATE <node_id>
+```
+
+#### 故障检测
+
+集群中每个节点都会定期想集群中其他节点发送 PING 命令，如果接收到 PING 命令的其他节点没有在规定的时间内返回 PONG 消息，那么发送 PING 命令的节点就会将接收 PING 命令的节点标记为疑似下线（PFAIL）。
+
+每个节点都会有一个链表，记录了所有其他节点对某个节点的下线报告。
+
+如果在一个集群内，半数以上负责处理槽的主节点都将某个主节点 x 报告为疑似下线，那么这个节点 x 将会被标记为已下线。将 x 标记为已下线的节点将向集群广播 x 已下线的消息，其他节点收到消息都会将 x 标记为已下线。
+
+#### 集群故障转移
+
+1. 复制下线主节点的所有从节点里面，会有一个从节点被选中。
+2. 被选中的从节点执行 SLAVEOF no one 命令，成为新的主节点。
+3. 新的主节点会撤销所有对已下线主节点的槽指派，并将这些槽全部指派给自己。
+4. 新的主节点向集群广播一条 PONG 消息，让集群中其他节点立即知道这个节点变更为主节点，并且这个主节点已经接管了原本由已下线节点负责处理的槽。
+5. 新的主节点开始接收和负责自己处理槽的相关命令。
+
+#### 选举新的主节点
+
+与选举领头 Sentinel 类似。
+
 ### 消息
+
+MEET: 将接受者加入到接受者集群中。
+
+PING: 检测选中的节点是否在线。
+
+PONG: 接收到 MEET\PING 消息后回复 PONG 消息。集群内广播。
+
+FAIL: 集群内广播某个节点已下线。
+
+PUBLISH: 集群内广播 PUBLISH 消息，接收到消息的节点执行相同的 PUBLISH 命令。
