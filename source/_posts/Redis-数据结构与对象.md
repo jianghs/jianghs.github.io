@@ -65,7 +65,7 @@ typedef struct list {
 
 由 list 结构和 listNode 结构组成的链表
 
-![list](https://raw.githubusercontent.com/jianghs/myBlogPicBed/master/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E6%88%AA%E5%9B%BE/redis-list.png)
+![list](http://picbed.jianghs.com/redis-list.png)
 
 特点：
 
@@ -115,7 +115,7 @@ typedef struct dictEntry {
 
 `*next` 可以将多个哈希值相同的键值对连接在一起。
 
-![hashtable](https://raw.githubusercontent.com/jianghs/myBlogPicBed/master/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E6%88%AA%E5%9B%BE/%E5%93%88%E5%B8%8C%E8%A1%A8.png)
+![hashtable](http://picbed.jianghs.com/%E5%93%88%E5%B8%8C%E8%A1%A8.png)
 
 #### 字典
 
@@ -139,7 +139,7 @@ privdata 属性则保存了需要传递给特定函数的可选参数。
 
 ht 属性是包含两个项的数组，字典只使用 ht[0] 哈希表，ht[1] 哈希表只会在对 ht[0] 哈希表 rehash 时使用。
 
-![dict](https://raw.githubusercontent.com/jianghs/myBlogPicBed/master/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E6%88%AA%E5%9B%BE/dict.png)
+![dict](http://picbed.jianghs.com/dict.png)
 
 #### 哈希算法
 
@@ -180,7 +180,7 @@ index = hash & dict -> ht[x].sizemask
 
 跳跃表包括一个 zskiplist 和 若干个 zskiplistNode。
 
-![skiplist](https://raw.githubusercontent.com/jianghs/myBlogPicBed/master/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E6%88%AA%E5%9B%BE/skiplist.png)
+![skiplist](http://picbed.jianghs.com/skiplist.png)
 
 zskiplist 结构包含
 
@@ -277,7 +277,7 @@ int8_t contents[];
 4. entryX：各个节点。
 5. zlend：标记压缩列表末端。
 
-![ziplist](https://raw.githubusercontent.com/jianghs/myBlogPicBed/master/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E6%88%AA%E5%9B%BE/ziplist.png)
+![ziplist](http://picbed.jianghs.com/ziplist.png)
 
 #### 压缩列表节点
 

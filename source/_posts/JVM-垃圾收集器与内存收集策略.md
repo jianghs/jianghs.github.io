@@ -111,7 +111,7 @@ jdk 1.2之后：
 
 ## HotSpot 垃圾收集器
 
-![hotspot](https://raw.githubusercontent.com/jianghs/myBlogPicBed/master/jvm/HotSpot%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8.png)
+![hotspot](http://picbed.jianghs.com/HotSpot%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8.png)
 
 ### Serial 收集器-新生代
 

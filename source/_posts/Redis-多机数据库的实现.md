@@ -67,7 +67,7 @@ categories: coding
 
 ### PSYNC 命令的实现
 
-![PSYNC 情况](https://raw.githubusercontent.com/jianghs/myBlogPicBed/master/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E6%88%AA%E5%9B%BE/PSYNC_PROCESS.png)
+![PSYNC 情况](http://picbed.jianghs.com/PSYNC_PROCESS.png)
 
 ### 复制的实现
 
@@ -84,11 +84,11 @@ categories: coding
     * 检查套接字是否读写正常。
     * 检查主服务器是否可以正常处理命令请求。
 
-    ![ping](https://raw.githubusercontent.com/jianghs/myBlogPicBed/master/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E6%88%AA%E5%9B%BE/PING.png)
+    ![ping](http://picbed.jianghs.com/PING.png)
 
 4. 身份验证
 
-    ![verify](https://raw.githubusercontent.com/jianghs/myBlogPicBed/master/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E6%88%AA%E5%9B%BE/verify.png)
+    ![verify](http://picbed.jianghs.com/verify.png)
 
 5. 发送端口信息
 
@@ -140,7 +140,7 @@ min-salves-to-write 和 min-slaves-max-lag 防止主服务器在不安全的情�
 
 Sentinel 服务器本质上是一个 Redis 服务器，但是初始化过程不完全一致。
 
-![Sentinel-init](https://raw.githubusercontent.com/jianghs/myBlogPicBed/master/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E6%88%AA%E5%9B%BE/Sentinel-init.png)
+![Sentinel-init](http://picbed.jianghs.com/Sentinel-init.png)
 
 #### 将普通 Redis 服务器使用的代码替换成 Sentinel 专用代码
 
@@ -548,7 +548,7 @@ ASKING 命令唯一要做的就是打开发送命令客户端的 REDIS_ASKING �
 
 节点判断是否执行客户端命令的过程
 
-![excute-client-command](https://raw.githubusercontent.com/jianghs/myBlogPicBed/master/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E6%88%AA%E5%9B%BE/excute-client-command.png)
+![excute-client-command](http://picbed.jianghs.com/excute-client-command.png)
 
 #### ASK 错误和 MOVED 错误的区别
 

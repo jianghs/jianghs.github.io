@@ -240,7 +240,7 @@ save 900 1
 
 ### RDB 文件结构
 
-![RDB](https://raw.githubusercontent.com/jianghs/myBlogPicBed/master/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E6%88%AA%E5%9B%BE/RDB_file_structure.png)
+![RDB](http://picbed.jianghs.com/RDB_file_structure.png)
 
 * REDIS：程序载入时快速检查是否时 RDB 文件。
 * db_version：4个字节，记录 RDB 文件版本号。
@@ -252,7 +252,7 @@ save 900 1
 
 一个 RDB 文件的 databases 部分可以保存任意多个非空数据库。
 
-![RDB-databases](https://raw.githubusercontent.com/jianghs/myBlogPicBed/master/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E6%88%AA%E5%9B%BE/RDB_databases.png)
+![RDB-databases](http://picbed.jianghs.com/RDB_databases.png)
 
 * SELECTDB：表明接下来读入的将是一个数据库号码。
 * db_number：记录的是数据库号码。
@@ -266,12 +266,12 @@ RDB 文件中的每个 key_value_pairs 部分都保存了一个或以上数量�
 * key 总是一个字符串对象。
 * 根据 TYPE 类型不同，以及保存内容长度不同，保存 value 的结构和长度也会有所不同。
 
-![key_value](https://raw.githubusercontent.com/jianghs/myBlogPicBed/master/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E6%88%AA%E5%9B%BE/key_value_without_expire.png)
+![key_value](http://picbed.jianghs.com/key_value_without_expire.png)
 
 * EXPIRETIME_MS 表示接下来是过期时间
 * ms 表示时间戳。
 
-![key_value_expire](https://raw.githubusercontent.com/jianghs/myBlogPicBed/master/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E6%88%AA%E5%9B%BE/key_value_with_expire.png)
+![key_value_expire](http://picbed.jianghs.com/key_value_with_expire.png)
 
 #### value
 
@@ -315,7 +315,7 @@ AOF 持久化功能打开时， 服务器执行完一个写命令时，会以协
 
 ### AOF 文件的载入和数据还原
 
-![AOF_LOAD](https://raw.githubusercontent.com/jianghs/myBlogPicBed/master/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E6%88%AA%E5%9B%BE/AOF_LOAD.png)
+![AOF_LOAD](http://picbed.jianghs.com/AOF_LOAD.png)
 
 ### AOF 的重写
 
@@ -367,7 +367,7 @@ Redis 服务器是一个时间驱动程序
 3. 文件事件分派器
 4. 事件处理器
 
-![file_event_processor](https://raw.githubusercontent.com/jianghs/myBlogPicBed/master/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E6%88%AA%E5%9B%BE/file_event_processor.png)
+![file_event_processor](http://picbed.jianghs.com/file_event_processor.png)
 
 #### I/O 多路复用程序的实现
 
@@ -394,7 +394,7 @@ Redis 服务器是一个时间驱动程序
 
 客户端和服务器通信过程
 
-![client_server_connect](https://raw.githubusercontent.com/jianghs/myBlogPicBed/master/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E6%88%AA%E5%9B%BE/client_server_connect.png)
+![client_server_connect](http://picbed.jianghs.com/client_server_connect.png)
 
 ### 时间事件
 
@@ -418,7 +418,7 @@ Redis 服务器是一个时间驱动程序
 
 ### 事件的调度与执行
 
-![server_process_under_event](https://raw.githubusercontent.com/jianghs/myBlogPicBed/master/redis%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0%E6%88%AA%E5%9B%BE/server_process_under_event.png)
+![server_process_under_event](http://picbed.jianghs.com/server_process_under_event.png)
 
 因为时间事件在文件事件之后执行，所以通常时间事件会有延迟的情况。
 
