@@ -1,0 +1,731 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<script src="//cdn.bootcss.com/pace/1.0.2/pace.min.js"></script>
+<link href="//cdn.bootcss.com/pace/1.0.2/themes/pink/pace-theme-flash.css" rel="stylesheet">
+<style>
+    .pace .pace-progress {
+        background: #1E92FB; /*进度条颜色*/
+        height: 3px;
+    }
+    .pace .pace-progress-inner {
+         box-shadow: 0 0 10px #1E92FB, 0 0 5px     #1E92FB; /*阴影颜色*/
+    }
+    .pace .pace-activity {
+        border-top-color: #1E92FB;    /*上边框颜色*/
+        border-left-color: #1E92FB;    /*左边框颜色*/
+    }
+</style>
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Java,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Life Line" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.png?v=5.0.1">
+
+
+
+
+
+
+<meta name="description" content="java io 机制io类库的基本架构 传输格式  基于字节操作：InputStream和OutputStream  基于字符操作：Writer和Reader  传输方式  基于磁盘操作：File  基于网络操作：Socket   无论磁盘或者网络传输，最小的存储单元都是字节而不是字符，为什么需要基于字符操作？ 因为程序中操作的数据是字符格式，而字符转成字节耗时，而且有编码的问题。 字节和字符的转">
+<meta name="keywords" content="Java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深入理解java web-java io">
+<meta property="og:url" content="http://yoursite.com/2019/12/10/深入理解java-web-java-io/index.html">
+<meta property="og:site_name" content="Life Line">
+<meta property="og:description" content="java io 机制io类库的基本架构 传输格式  基于字节操作：InputStream和OutputStream  基于字符操作：Writer和Reader  传输方式  基于磁盘操作：File  基于网络操作：Socket   无论磁盘或者网络传输，最小的存储单元都是字节而不是字符，为什么需要基于字符操作？ 因为程序中操作的数据是字符格式，而字符转成字节耗时，而且有编码的问题。 字节和字符的转">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-03-16T15:43:15.711Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="深入理解java web-java io">
+<meta name="twitter:description" content="java io 机制io类库的基本架构 传输格式  基于字节操作：InputStream和OutputStream  基于字符操作：Writer和Reader  传输方式  基于磁盘操作：File  基于网络操作：Socket   无论磁盘或者网络传输，最小的存储单元都是字节而不是字符，为什么需要基于字符操作？ 因为程序中操作的数据是字符格式，而字符转成字节耗时，而且有编码的问题。 字节和字符的转">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"right","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+  <title> 深入理解java web-java io | Life Line </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-right page-post-detail ">
+    <div class="headband"></div>
+
+    <a href="https://github.com/jianghs/jianghs.github.io" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewbox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; left: 0; transform: scale(-1, 1);" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style></a>
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Life Line</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">Constant Dropping Wears Away A Stone</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                深入理解java web-java io
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2019-12-10T21:47:03+08:00" content="2019-12-10">
+              2019-12-10
+            </time>
+          </span>
+
+          
+            <span class="post-category">
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/coding/" itemprop="url" rel="index">
+                    <span itemprop="name">coding</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="java-io-机制"><a href="#java-io-机制" class="headerlink" title="java io 机制"></a>java io 机制</h2><h3 id="io类库的基本架构"><a href="#io类库的基本架构" class="headerlink" title="io类库的基本架构"></a>io类库的基本架构</h3><ol>
+<li><p>传输格式</p>
+<p> 基于字节操作：InputStream和OutputStream</p>
+<p> 基于字符操作：Writer和Reader</p>
+</li>
+<li><p>传输方式</p>
+<p> 基于磁盘操作：File</p>
+<p> 基于网络操作：Socket</p>
+</li>
+</ol>
+<p>无论磁盘或者网络传输，最小的存储单元都是字节而不是字符，为什么需要基于字符操作？</p>
+<p>因为程序中操作的数据是字符格式，而字符转成字节耗时，而且有编码的问题。</p>
+<h2 id="字节和字符的转换"><a href="#字节和字符的转换" class="headerlink" title="字节和字符的转换"></a>字节和字符的转换</h2><ol>
+<li>InputStreamReader 字节转字符</li>
+<li>OutStreamWriter 字符转字节</li>
+</ol>
+<h2 id="磁盘IO工作机制"><a href="#磁盘IO工作机制" class="headerlink" title="磁盘IO工作机制"></a>磁盘IO工作机制</h2><h3 id="标准访问文件方式"><a href="#标准访问文件方式" class="headerlink" title="标准访问文件方式"></a>标准访问文件方式</h3><p>读：从缓存中读取，有则取出，没有则从磁盘读取，然后缓存在操作系统缓存中。</p>
+<p>写：用户地址空间复制到内存地址空间缓存后，对于应用程序而言就是写完毕。</p>
+<h3 id="直接IO方式"><a href="#直接IO方式" class="headerlink" title="直接IO方式"></a>直接IO方式</h3><p>应用程序直接访问磁盘空间，而不经过内存地址空间缓存。</p>
+<h3 id="同步访问文件方式"><a href="#同步访问文件方式" class="headerlink" title="同步访问文件方式"></a>同步访问文件方式</h3><p>写：只有当数据全部写入到磁盘时才会认为写入完毕。<br>性能较差，只有对数据安全性比较高的场景才会有要求。</p>
+<h3 id="异步访问文件方式"><a href="#异步访问文件方式" class="headerlink" title="异步访问文件方式"></a>异步访问文件方式</h3><p>当访问数据的请求发出去后，应用程序线程不会阻塞，而是去处理其他任务。<br>可以提高应用程序效率而无法提高文件访问效率。</p>
+<h3 id="内存映射方式"><a href="#内存映射方式" class="headerlink" title="内存映射方式"></a>内存映射方式</h3><p>将内存中某块区域与磁盘中的文件关联，访问内存区域时相当于直接访问磁盘文件。</p>
+<h2 id="网络IO工作机制"><a href="#网络IO工作机制" class="headerlink" title="网络IO工作机制"></a>网络IO工作机制</h2><p>影响网络传输的因素</p>
+<ol>
+<li>网络带宽</li>
+<li>传输距离</li>
+<li>TCP拥塞控制</li>
+</ol>
+<h2 id="java-socket-工作机制"><a href="#java-socket-工作机制" class="headerlink" title="java socket 工作机制"></a>java socket 工作机制</h2><p>客户端：Socket 实例，创建实例成功之前将进行tcp三次握手。</p>
+<p>服务端：SocketServer 实例。</p>
+<h3 id="数据传输"><a href="#数据传输" class="headerlink" title="数据传输"></a>数据传输</h3><ol>
+<li>客户端每个Socket实例都会有一个InputStream和一个OutputStream，并通过这两个对象来交换数据。</li>
+<li>写入端将数据写入到OutputStream对应的SendQ队列中，读取端从InputStream对应的RecvQ队列中读取数据。</li>
+<li>网络io的读取和写入有一个协同的过程，如果两边同时传输数据，可能产生死锁。</li>
+</ol>
+<h2 id="NIO的工作方式"><a href="#NIO的工作方式" class="headerlink" title="NIO的工作方式"></a>NIO的工作方式</h2><p>BIO的弊端</p>
+<ol>
+<li>难以解决线程数过多的问题</li>
+<li>线程优先级难以控制</li>
+<li>线程并发</li>
+</ol>
+<h2 id="NIO工作机制"><a href="#NIO工作机制" class="headerlink" title="NIO工作机制"></a>NIO工作机制</h2><p>Channel:比Socket更加具体，可以看作是某个具体的交通工具</p>
+<p>Selector:调度系统，轮循每个Channel的状态。</p>
+<p>Buffer:比Stream更加具体，可以看作车辆上的座位。</p>
+<h3 id="两个线程"><a href="#两个线程" class="headerlink" title="两个线程"></a>两个线程</h3><p>一个线程专门监听客户端的连接请求，以阻塞的方式。</p>
+<p>一个线程专门处理连接请求，以非阻塞的方式。</p>
+<h2 id="Buffer的工作方式"><a href="#Buffer的工作方式" class="headerlink" title="Buffer的工作方式"></a>Buffer的工作方式</h2><p>一组基本数据类型的元素列表。</p>
+<p>capacity:缓冲区数组的总长度。</p>
+<p>position:下一个要操作的数据元素的位置。</p>
+<p>limit:缓冲区数组不可操作的元素位置。</p>
+<p>mark:记录当前position前一个位置或默认为0。</p>
+<h2 id="NIO数据访问方式"><a href="#NIO数据访问方式" class="headerlink" title="NIO数据访问方式"></a>NIO数据访问方式</h2><ol>
+<li><p>FileChannel.TransferTo/FileChannel.TransferFrom 数据直接在内核空间中移动</p>
+</li>
+<li><p>FileChannel.TransferMap 将文件按照一定大小块映射为内存空间，将程序访问这个内存空间时将直接操作这个文件，省去从内核空间到用户空间的复制的过程，适合大文件读的操作。</p>
+</li>
+</ol>
+<h2 id="IO调优"><a href="#IO调优" class="headerlink" title="IO调优"></a>IO调优</h2><p>1、磁盘IO优化</p>
+<ul>
+<li>增加缓存，减少磁盘访问次数。</li>
+<li>合适的磁盘管理和磁盘策略。</li>
+<li>设计合适的磁盘存储数据块和访问这些数据块的策略。</li>
+<li>合理的RAID策略</li>
+</ul>
+<p>2、网络IO优化</p>
+<ul>
+<li>减少网络交互次数</li>
+<li>减少网络传输数据量大小</li>
+<li>尽量减少编码</li>
+</ul>
+<h2 id="同步和异步"><a href="#同步和异步" class="headerlink" title="同步和异步"></a>同步和异步</h2><p>同步:一个任务完成依赖另一个任务，可靠的任务序列</p>
+<p>异步:不可靠的任务序列</p>
+<p>同步可以保证任务的可靠性，异步可以提升任务的性能。</p>
+<h2 id="阻塞和非阻塞"><a href="#阻塞和非阻塞" class="headerlink" title="阻塞和非阻塞"></a>阻塞和非阻塞</h2><p>阻塞:cpu等待任务完成后，再执行下一个任务。</p>
+<p>非阻塞:任务执行时，cpu执行下一个任务。</p>
+<p>非阻塞可以提高cpu利用率，但是会增加线程切换。</p>
+<h2 id="java-io中的适配器模式"><a href="#java-io中的适配器模式" class="headerlink" title="java io中的适配器模式"></a>java io中的适配器模式</h2><p>InputStreamReader把InputStream适配成Reader</p>
+<p>OutputStreamWriter把OutputStream适配成Writer</p>
+<h2 id="java-io中的装饰器模式"><a href="#java-io中的装饰器模式" class="headerlink" title="java io中的装饰器模式"></a>java io中的装饰器模式</h2><p>目的是增强原有接口的功能</p>
+<p>FilterInputStream、BufferedInputStream</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"><i class="fa fa-tag"></i>Java</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/12/10/深入理解java-web-web请求过程/" rel="next" title="深入理解java web-web请求过程">
+                <i class="fa fa-chevron-left"></i> 深入理解java web-web请求过程
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/12/11/深入理解java-web-中文编码/" rel="prev" title="深入理解java web-中文编码">
+                深入理解java web-中文编码 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/uploads/timg.jpeg" alt="J">
+          <p class="site-author-name" itemprop="name">J</p>
+          <p class="site-description motion-element" itemprop="description">A Coder</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">22</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">13</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/jianghs" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#java-io-机制"><span class="nav-number">1.</span> <span class="nav-text">java io 机制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#io类库的基本架构"><span class="nav-number">1.1.</span> <span class="nav-text">io类库的基本架构</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#字节和字符的转换"><span class="nav-number">2.</span> <span class="nav-text">字节和字符的转换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#磁盘IO工作机制"><span class="nav-number">3.</span> <span class="nav-text">磁盘IO工作机制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#标准访问文件方式"><span class="nav-number">3.1.</span> <span class="nav-text">标准访问文件方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#直接IO方式"><span class="nav-number">3.2.</span> <span class="nav-text">直接IO方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#同步访问文件方式"><span class="nav-number">3.3.</span> <span class="nav-text">同步访问文件方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#异步访问文件方式"><span class="nav-number">3.4.</span> <span class="nav-text">异步访问文件方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#内存映射方式"><span class="nav-number">3.5.</span> <span class="nav-text">内存映射方式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#网络IO工作机制"><span class="nav-number">4.</span> <span class="nav-text">网络IO工作机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#java-socket-工作机制"><span class="nav-number">5.</span> <span class="nav-text">java socket 工作机制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#数据传输"><span class="nav-number">5.1.</span> <span class="nav-text">数据传输</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NIO的工作方式"><span class="nav-number">6.</span> <span class="nav-text">NIO的工作方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NIO工作机制"><span class="nav-number">7.</span> <span class="nav-text">NIO工作机制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#两个线程"><span class="nav-number">7.1.</span> <span class="nav-text">两个线程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Buffer的工作方式"><span class="nav-number">8.</span> <span class="nav-text">Buffer的工作方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NIO数据访问方式"><span class="nav-number">9.</span> <span class="nav-text">NIO数据访问方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IO调优"><span class="nav-number">10.</span> <span class="nav-text">IO调优</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#同步和异步"><span class="nav-number">11.</span> <span class="nav-text">同步和异步</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#阻塞和非阻塞"><span class="nav-number">12.</span> <span class="nav-text">阻塞和非阻塞</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#java-io中的适配器模式"><span class="nav-number">13.</span> <span class="nav-text">java io中的适配器模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#java-io中的装饰器模式"><span class="nav-number">14.</span> <span class="nav-text">java io中的装饰器模式</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy;  2017 - 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">J</span>
+</div>
+
+<div>
+      <!--统计start-->
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+      <span id="busuanzi_container_site_pv">
+    本站总访问量<span id="busuanzi_value_site_pv"></span>次
+  </span>
+</div>
+<div>
+      <span id="busuanzi_container_site_uv">
+  总访客数<span id="busuanzi_value_site_uv"></span>人次
+  </span>
+      <!--统计end-->
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+<div class="theme-info">
+  <div class="powered-by"></div>
+  <span class="post-count">博客全站共31k字</span>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+  
+  
+
+  
+
+  
+
+</body>
+</html>
