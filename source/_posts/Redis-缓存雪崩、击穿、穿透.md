@@ -2,7 +2,7 @@
 title: Redis 缓存雪崩、击穿、穿透
 date: 2020-03-18 16:08:39
 tags: Redis
-categories: Coding
+categories: coding
 ---
 
 ## 缓存雪崩
